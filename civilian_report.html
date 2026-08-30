@@ -306,10 +306,24 @@
                     
                     if (data && data.address) {
                         const parish = data.address.state || data.address.county || data.address.city || "Unknown Parish";
-                        const road = data.address.road || "Unknown Road";
-                        const suburb = data.address.suburb || data.address.neighbourhood || "";
                         
-                        const fullAddr = `${road}${suburb ? ', ' + suburb : ''}, ${parish}`;
+                        // Extract granular location parts (road, village, town, suburb)
+                        const parts = [];
+                        if (data.address.road) parts.push(data.address.road);
+                        if (data.address.neighbourhood) parts.push(data.address.neighbourhood);
+                        if (data.address.suburb) parts.push(data.address.suburb);
+                        if (data.address.village) parts.push(data.address.village);
+                        if (data.address.town) parts.push(data.address.town);
+                        
+                        let fullAddr = "";
+                        if (parts.length > 0) {
+                            // Use up to 2 specific local parts + the parish
+                            fullAddr = [...new Set(parts)].slice(0, 2).join(', ') + `, ${parish}`;
+                        } else {
+                            // Fallback to the API's auto-generated display name, shortened
+                            fullAddr = data.display_name.split(',').slice(0, 3).join(',').trim();
+                        }
+                        
                         locInput.value = fullAddr;
                         jurInput.value = parish; // Save parish for routing
 
