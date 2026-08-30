@@ -356,6 +356,9 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">autorenew</span> <span class="tracking-wide">Encrypting & Submitting...</span>';
 
+            const latVal = sessionStorage.getItem('incidentLat');
+            const lonVal = sessionStorage.getItem('incidentLon');
+
             const payload = {
                 type: incType,
                 location: incLoc,
@@ -367,6 +370,11 @@
                 statutoryDocs: statDocs,
                 scenePhotos: scenePhotos
             };
+
+            if (latVal && lonVal) {
+                payload.latitude = parseFloat(latVal);
+                payload.longitude = parseFloat(lonVal);
+            }
 
             try {
                 const response = await apiFetch('https://sentinel-system-nfqp.onrender.com/api/incidents', {
@@ -387,6 +395,8 @@
                 sessionStorage.removeItem('scenePhotos');
                 sessionStorage.removeItem('vehicleDetails');
                 sessionStorage.removeItem('witnesses');
+                sessionStorage.removeItem('incidentLat');
+                sessionStorage.removeItem('incidentLon');
                 
                 successMsg.classList.remove('hidden');
                 submitBtn.classList.add('hidden');
