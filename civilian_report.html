@@ -307,9 +307,14 @@
                     if (data && data.address) {
                         const parish = data.address.state || data.address.county || data.address.city || "Unknown Parish";
                         
-                        // Extract granular location parts (road, village, town, suburb)
+                        // Extract granular location parts (house_number, road, village, town, suburb)
                         const parts = [];
-                        if (data.address.road) parts.push(data.address.road);
+                        if (data.address.house_number && data.address.road) {
+                            parts.push(`${data.address.house_number} ${data.address.road}`);
+                        } else if (data.address.road) {
+                            parts.push(data.address.road);
+                        }
+                        
                         if (data.address.neighbourhood) parts.push(data.address.neighbourhood);
                         if (data.address.suburb) parts.push(data.address.suburb);
                         if (data.address.village) parts.push(data.address.village);
