@@ -301,7 +301,7 @@
 
                 try {
                     // Use OpenStreetMap Nominatim API
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14`);
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18`);
                     const data = await res.json();
                     
                     if (data && data.address) {
