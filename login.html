@@ -119,8 +119,11 @@
                     <input type="password" id="password" required class="glass-input w-full rounded-lg px-4 py-3 transition-shadow" placeholder="••••••••">
                 </div>
 
-                <div id="signup-toggle-container" class="hidden items-center">
-                    <!-- Signup disabled for private access -->
+                <div id="signup-toggle-container" class="flex items-center">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="is-signup" class="rounded border-slate-300 text-emerald focus:ring-emerald">
+                        <span class="ml-2 text-sm text-slate-600 group-hover:text-slate-900 transition-colors">I don't have an account (Civilian Sign up)</span>
+                    </label>
                 </div>
 
                 <button type="submit" id="submit-btn" class="w-full bg-slate-900 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-800 transition-all shadow-md flex justify-center items-center gap-2 group">
@@ -168,9 +171,14 @@
 
         function updateUI() {
             if (roleOfficer.checked) {
+                signupToggleContainer.classList.add('hidden');
+                socialLogins.classList.add('hidden');
+                isSignup.checked = false;
                 btnText.textContent = 'Officer Login';
             } else {
-                btnText.textContent = 'Civilian Login';
+                signupToggleContainer.classList.remove('hidden');
+                socialLogins.classList.remove('hidden');
+                btnText.textContent = isSignup.checked ? 'Create Account' : 'Civilian Login';
             }
         }
 
@@ -235,14 +243,21 @@
             }, 3000);
 
             try {
-                const cred = await signInWithEmailAndPassword(auth, email, password);
-                await handleAuthSuccess(cred);
+                if (isSignup.checked && roleCivilian.checked) {
+                    const cred = await createUserWithEmailAndPassword(auth, email, password);
+                    await handleAuthSuccess(cred);
+                } else {
+                    const cred = await signInWithEmailAndPassword(auth, email, password);
+                    await handleAuthSuccess(cred);
+                }
             } catch (err) {
                 errorMsg.classList.replace('text-emerald-700', 'text-red-700');
                 errorMsg.classList.replace('bg-emerald-50', 'bg-red-50');
                 errorMsg.classList.replace('border-emerald-200', 'border-red-200');
                 if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-login-credentials') {
-                    showError("Account not found or invalid credentials. Ensure you have been granted access.");
+                    showError("Account not found or invalid credentials. Please click 'Sign Up' to create a new account.");
+                } else if (err.code === 'auth/email-already-in-use') {
+                    showError("Email is already in use. Please uncheck 'Sign up' and log in.");
                 } else {
                     showError(err.message);
                 }
