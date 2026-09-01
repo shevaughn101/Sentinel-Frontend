@@ -329,7 +329,9 @@
             document.getElementById('wit-container').classList.remove('hidden');
             const wl = document.getElementById('witness-list');
             witnesses.forEach(w => {
-                wl.innerHTML += `<p class="text-sm text-slate-800"><span class="font-bold">${w.name || 'Anonymous'}</span> &bull; ${w.phone || 'No phone'}</p>`;
+                const nameStr = (w.firstName || w.lastName) ? `${w.firstName || ''} ${w.lastName || ''}`.trim() : (w.name || 'Anonymous');
+                const addrStr = w.address ? `<br><span class="text-xs text-slate-500"><span class="material-symbols-outlined text-[14px] align-middle mt-1">home</span> ${w.address}</span>` : '';
+                wl.innerHTML += `<div class="mb-2"><p class="text-sm text-slate-800"><span class="font-bold">${nameStr}</span> &bull; ${w.phone || 'No phone'}</p>${addrStr}</div>`;
             });
         }
 
