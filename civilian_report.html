@@ -359,31 +359,18 @@
         const reverseGeocode = async (lat, lon) => {
             locStatus.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px] align-middle mr-1">autorenew</span> Translating coordinates...';
             try {
-                // Use OpenStreetMap Nominatim API with zoom 18 for high precision
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+                // Use BigDataCloud Free Client-Side Reverse Geocoding API (Fast & No Rate Limits)
+                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
                 const data = await res.json();
                 
-                if (data && data.address) {
-                    const parish = data.address.state || data.address.county || data.address.city || "Unknown Parish";
-                    
-                    // Extract granular location parts
-                    const parts = [];
-                    if (data.address.house_number && data.address.road) {
-                        parts.push(`${data.address.house_number} ${data.address.road}`);
-                    } else if (data.address.road) {
-                        parts.push(data.address.road);
-                    }
-                    
-                    if (data.address.neighbourhood) parts.push(data.address.neighbourhood);
-                    if (data.address.suburb) parts.push(data.address.suburb);
-                    if (data.address.village) parts.push(data.address.village);
-                    if (data.address.town) parts.push(data.address.town);
+                if (data) {
+                    const parish = data.principalSubdivision || data.city || "Unknown Parish";
                     
                     let fullAddr = "";
-                    if (parts.length > 0) {
-                        fullAddr = [...new Set(parts)].slice(0, 2).join(', ') + `, ${parish}`;
+                    if (data.locality) {
+                        fullAddr = `${data.locality}, ${parish}`;
                     } else {
-                        fullAddr = data.display_name.split(',').slice(0, 3).join(',').trim();
+                        fullAddr = `${data.city || data.principalSubdivision}, ${data.countryName}`;
                     }
                     
                     locInput.value = fullAddr;
@@ -450,10 +437,15 @@
                 locateBtn.disabled = false;
                 
             }, (error) => {
-                locStatus.textContent = "Location access denied or failed. Please type it manually.";
+                let msg = "Location access denied or failed.";
+                if (error.code === 1) msg = "Location access was denied. Please allow permissions.";
+                else if (error.code === 2) msg = "Position unavailable. Device lost signal.";
+                else if (error.code === 3) msg = "GPS lock timed out. Try stepping outside.";
+                
+                locStatus.textContent = msg + " You can still type it manually.";
                 locStatus.classList.replace('text-slate-500', 'text-amber-600');
                 locateBtn.disabled = false;
-            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+            }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
         });
 
         document.getElementById('report-form').addEventListener('submit', (e) => {
