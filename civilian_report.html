@@ -194,11 +194,11 @@
                     <h3 class="font-headline font-bold text-slate-800 md:col-span-2">Vehicle Details</h3>
                     <div>
                         <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Licence Plate</label>
-                        <input id="veh-plate" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="e.g. 1234 XY">
+                        <input id="veh-plate" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="e.g. 1234 XY" maxlength="10">
                     </div>
                     <div>
                         <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Chassis / VIN Number</label>
-                        <input id="veh-vin" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="17-character VIN">
+                        <input id="veh-vin" type="text" class="glass-input w-full rounded-lg px-4 py-3 uppercase" placeholder="17-character VIN" pattern="[A-HJ-NPR-Z0-9a-hj-npr-z]{17}" maxlength="17" title="Must be exactly 17 characters (excluding I, O, Q)">
                     </div>
                     <div>
                         <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Make</label>
@@ -221,8 +221,16 @@
                         <input id="wit-name" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="Full Name">
                     </div>
                     <div>
-                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Witness Phone</label>
-                        <input id="wit-phone" type="tel" class="glass-input w-full rounded-lg px-4 py-3" placeholder="e.g. 876-123-4567">
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Witness Phone (Optional)</label>
+                        <div class="flex gap-2">
+                            <select id="wit-country-code" class="glass-input rounded-lg px-2 py-3 w-[140px] shrink-0 text-sm">
+                                <option value="+1876">+1 (876) Jamaica</option>
+                                <option value="+1658">+1 (658) Jamaica</option>
+                                <option value="+1">+1 (US/CA)</option>
+                                <option value="+44">+44 (UK)</option>
+                            </select>
+                            <input id="wit-phone" type="tel" class="glass-input w-full rounded-lg px-4 py-3 flex-1" placeholder="1234567" pattern="[0-9]{7,15}" title="Enter phone number digits only without spaces">
+                        </div>
                     </div>
                 </div>
 
@@ -418,7 +426,9 @@
             sessionStorage.setItem('vehicleDetails', JSON.stringify(vehicleDetails));
 
             const witnessName = document.getElementById('wit-name').value;
-            const witnessPhone = document.getElementById('wit-phone').value;
+            const witnessPhoneRaw = document.getElementById('wit-phone').value;
+            const witnessPhone = witnessPhoneRaw ? document.getElementById('wit-country-code').value + " " + witnessPhoneRaw : "";
+            
             if (witnessName || witnessPhone) {
                 sessionStorage.setItem('witnesses', JSON.stringify([{ name: witnessName, phone: witnessPhone }]));
             } else {
