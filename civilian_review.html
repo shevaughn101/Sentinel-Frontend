@@ -183,6 +183,12 @@
                             </div>
                         </div>
 
+                        <!-- Involved Parties -->
+                        <div id="parties-container" class="hidden">
+                            <p class="font-label text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 border-t border-slate-200 pt-4 mt-2">Involved Parties</p>
+                            <div id="parties-list" class="space-y-3"></div>
+                        </div>
+
                         <!-- Witness Details -->
                         <div id="wit-container" class="hidden">
                             <p class="font-label text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 border-t border-slate-200 pt-4 mt-2">Witness Details</p>
@@ -288,6 +294,7 @@
         const scenePhotos = JSON.parse(sessionStorage.getItem('scenePhotos') || '[]');
         const vehDetails = JSON.parse(sessionStorage.getItem('vehicleDetails') || '{}');
         const witnesses = JSON.parse(sessionStorage.getItem('witnesses') || '[]');
+        const involvedParties = JSON.parse(sessionStorage.getItem('involvedParties') || '[]');
 
         const incType = sessionStorage.getItem('incidentType') || 'Not provided';
         const incLoc = sessionStorage.getItem('incidentLocation') || 'Not provided';
@@ -306,6 +313,15 @@
             document.getElementById('v-make').textContent = (vehDetails.make || '') + ' ' + (vehDetails.model || '');
             document.getElementById('v-color').textContent = vehDetails.color || 'N/A';
             document.getElementById('v-vin').textContent = vehDetails.vin || 'N/A';
+        }
+
+        // Involved Parties
+        if (involvedParties.length > 0) {
+            document.getElementById('parties-container').classList.remove('hidden');
+            const pl = document.getElementById('parties-list');
+            involvedParties.forEach(p => {
+                pl.innerHTML += `<div class="mb-2"><p class="text-xs font-bold text-slate-500 uppercase">${p.party}</p><p class="text-sm text-slate-800"><span class="font-bold">${p.firstName} ${p.lastName}</span> &bull; ${p.phone || 'No phone'}</p></div>`;
+            });
         }
 
         // Witnesses
@@ -366,6 +382,7 @@
                 description: incDesc,
                 timestamp: new Date().toISOString(),
                 vehicleDetails: vehDetails,
+                involvedParties: involvedParties,
                 witnesses: witnesses,
                 statutoryDocs: statDocs,
                 scenePhotos: scenePhotos
@@ -394,6 +411,7 @@
                 sessionStorage.removeItem('statutoryDocs');
                 sessionStorage.removeItem('scenePhotos');
                 sessionStorage.removeItem('vehicleDetails');
+                sessionStorage.removeItem('involvedParties');
                 sessionStorage.removeItem('witnesses');
                 sessionStorage.removeItem('incidentLat');
                 sessionStorage.removeItem('incidentLon');

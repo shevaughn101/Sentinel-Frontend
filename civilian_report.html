@@ -215,6 +215,56 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 pt-6 mt-6">
+                    <h3 class="font-headline font-bold text-slate-800 md:col-span-2">Involved Parties (Drivers / Owners)</h3>
+                    
+                    <!-- Party 1 -->
+                    <div class="md:col-span-2 text-sm font-bold text-emerald mt-2 border-b border-slate-100 pb-1">Party 1 (You)</div>
+                    <div>
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">First Name</label>
+                        <input id="p1-first" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="John" required>
+                    </div>
+                    <div>
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Last Name</label>
+                        <input id="p1-last" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="Doe" required>
+                    </div>
+                    <div>
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Contact Number</label>
+                        <div class="flex gap-2">
+                            <select id="p1-country" class="glass-input rounded-lg px-2 py-3 w-[140px] shrink-0 text-sm">
+                                <option value="+1876">+1 (876) Jamaica</option>
+                                <option value="+1658">+1 (658) Jamaica</option>
+                                <option value="+1">+1 (US/CA)</option>
+                                <option value="+44">+44 (UK)</option>
+                            </select>
+                            <input id="p1-phone" type="tel" class="glass-input w-full rounded-lg px-4 py-3 flex-1" placeholder="1234567" pattern="[0-9]{7,15}" required>
+                        </div>
+                    </div>
+
+                    <!-- Party 2 -->
+                    <div class="md:col-span-2 text-sm font-bold text-amber mt-4 border-b border-slate-100 pb-1">Party 2 (Other Involved)</div>
+                    <div>
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">First Name</label>
+                        <input id="p2-first" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="Jane">
+                    </div>
+                    <div>
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Last Name</label>
+                        <input id="p2-last" type="text" class="glass-input w-full rounded-lg px-4 py-3" placeholder="Smith">
+                    </div>
+                    <div>
+                        <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Contact Number (Optional)</label>
+                        <div class="flex gap-2">
+                            <select id="p2-country" class="glass-input rounded-lg px-2 py-3 w-[140px] shrink-0 text-sm">
+                                <option value="+1876">+1 (876) Jamaica</option>
+                                <option value="+1658">+1 (658) Jamaica</option>
+                                <option value="+1">+1 (US/CA)</option>
+                                <option value="+44">+44 (UK)</option>
+                            </select>
+                            <input id="p2-phone" type="tel" class="glass-input w-full rounded-lg px-4 py-3 flex-1" placeholder="1234567" pattern="[0-9]{7,15}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 pt-6 mt-6">
                     <h3 class="font-headline font-bold text-slate-800 md:col-span-2">Witness Details (Optional)</h3>
                     <div>
                         <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Witness Name</label>
@@ -424,6 +474,26 @@
                 color: document.getElementById('veh-color').value
             };
             sessionStorage.setItem('vehicleDetails', JSON.stringify(vehicleDetails));
+            
+            const involvedParties = [];
+            involvedParties.push({
+                party: "Party 1 (You)",
+                firstName: document.getElementById('p1-first').value,
+                lastName: document.getElementById('p1-last').value,
+                phone: document.getElementById('p1-country').value + " " + document.getElementById('p1-phone').value
+            });
+            const p2First = document.getElementById('p2-first').value;
+            const p2Last = document.getElementById('p2-last').value;
+            const p2Phone = document.getElementById('p2-phone').value;
+            if (p2First || p2Last || p2Phone) {
+                involvedParties.push({
+                    party: "Party 2 (Other)",
+                    firstName: p2First,
+                    lastName: p2Last,
+                    phone: p2Phone ? document.getElementById('p2-country').value + " " + p2Phone : ""
+                });
+            }
+            sessionStorage.setItem('involvedParties', JSON.stringify(involvedParties));
 
             const witnessName = document.getElementById('wit-name').value;
             const witnessPhoneRaw = document.getElementById('wit-phone').value;
