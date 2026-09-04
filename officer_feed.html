@@ -55,6 +55,20 @@
         </div>
     </header>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 right-6 z-[100] transform translate-x-[200%] transition-transform duration-300 ease-in-out">
+        <div class="glass-panel bg-emerald/10 border-emerald/20 text-emerald-800 p-4 rounded-xl shadow-lg flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald">notifications_active</span>
+            <div>
+                <h4 class="font-bold text-sm font-headline">New Incident Reported</h4>
+                <p class="text-xs font-label">A new report requires your attention.</p>
+            </div>
+            <button onclick="document.getElementById('toast').classList.add('translate-x-[200%]')" class="ml-4 text-emerald hover:text-emerald-900">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+    </div>
+
     <main class="flex-1 max-w-[1000px] w-full mx-auto px-4 sm:px-6 py-8 animate-fade-in">
         <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -78,8 +92,9 @@
     </main>
 
     <script type="module">
-        import { auth, apiFetch } from './firebase-config.js';
+        import { auth, apiFetch, db } from './firebase-config.js';
         import { signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         document.getElementById('logout-btn').addEventListener('click', () => {
             signOut(auth).then(() => window.location.href = 'login.html');
@@ -99,6 +114,40 @@
                     document.getElementById('jurisdiction-label').innerHTML = `Jurisdiction: <span class="font-bold text-slate-700">${jur}</span>`;
                     
                     loadIncidents();
+                    
+                    // Setup Real-Time Listener for Notifications
+                    let q;
+                    if (role === 'admin' || jur === 'National') {
+                        q = query(collection(db, 'incidents'), where('status', '==', 'pending'));
+                    } else {
+                        q = query(collection(db, 'incidents'), where('status', '==', 'pending'), where('jurisdiction', '==', jur));
+                    }
+
+                    let initialLoad = true;
+                    onSnapshot(q, (snapshot) => {
+                        if (initialLoad) {
+                            initialLoad = false;
+                            return;
+                        }
+                        
+                        let hasNew = false;
+                        snapshot.docChanges().forEach((change) => {
+                            if (change.type === "added") hasNew = true;
+                        });
+
+                        if (hasNew) {
+                            const toast = document.getElementById('toast');
+                            toast.classList.remove('translate-x-[200%]');
+                            
+                            // Auto-refresh the feed to get the new incidents with secure Signed URLs!
+                            loadIncidents();
+                            
+                            setTimeout(() => {
+                                toast.classList.add('translate-x-[200%]');
+                            }, 5000);
+                        }
+                    });
+
                 } catch (e) {
                     console.error(e);
                 }
