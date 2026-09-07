@@ -116,7 +116,7 @@
                     const jur = tokenResult.claims.jurisdiction || 'Unknown';
                     document.getElementById('jurisdiction-label').innerHTML = `Jurisdiction: <span class="font-bold text-slate-700">${jur}</span>`;
                     
-                    if (role === 'admin') {
+                    if (role === 'admin' || role === 'officer') {
                         document.getElementById('admin-nav-btn').classList.remove('hidden');
                     }
                     
