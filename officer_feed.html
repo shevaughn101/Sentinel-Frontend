@@ -121,7 +121,7 @@
                     }
                     
                     await loadOfficerList();
-                    loadIncidents();
+                    loadIncidents(role);
                     
                     // Setup Real-Time Listener for Notifications
                     let q;
@@ -138,22 +138,19 @@
                             return;
                         }
                         
-                        let hasNew = false;
                         snapshot.docChanges().forEach((change) => {
-                            if (change.type === "added") hasNew = true;
+                            if (change.type === "added") {
+                                const toast = document.getElementById('toast');
+                                toast.classList.remove('translate-x-[200%]');
+                                
+                                // Auto-refresh the feed to get the new incidents with secure Signed URLs!
+                                loadIncidents(role);
+                                
+                                setTimeout(() => {
+                                    toast.classList.add('translate-x-[200%]');
+                                }, 5000);
+                            }
                         });
-
-                        if (hasNew) {
-                            const toast = document.getElementById('toast');
-                            toast.classList.remove('translate-x-[200%]');
-                            
-                            // Auto-refresh the feed to get the new incidents with secure Signed URLs!
-                            loadIncidents();
-                            
-                            setTimeout(() => {
-                                toast.classList.add('translate-x-[200%]');
-                            }, 5000);
-                        }
                     });
 
                 } catch (e) {
@@ -194,7 +191,7 @@
             }
         }
 
-        async function loadIncidents() {
+        async function loadIncidents(currentUserRole = 'officer') {
             try {
                 const response = await apiFetch('https://sentinel-system-nfqp.onrender.com/api/officer/incidents');
                 if (!response.ok) throw new Error("Failed to fetch incidents");
@@ -315,7 +312,7 @@
                                     <option value="investigating" ${inc.status === 'investigating' ? 'selected' : ''}>Investigating</option>
                                     <option value="resolved" ${inc.status === 'resolved' ? 'selected' : ''}>Resolved</option>
                                 </select>
-                                <select class="text-xs font-bold font-label bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700 outline-none focus:border-emerald max-w-[150px]" onchange="updateStatus('${inc.id}', 'assigned_to', this.value)">
+                                <select class="text-xs font-bold font-label bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700 outline-none focus:border-emerald max-w-[150px]" onchange="updateStatus('${inc.id}', 'assigned_to', this.value)" ${currentUserRole !== 'admin' ? 'disabled' : ''}>
                                     <option value="">Unassigned</option>
                                     ${availableOfficers.map(o => `<option value="${o.email}" ${inc.assigned_to === o.email ? 'selected' : ''}>${o.email}</option>`).join('')}
                                 </select>
