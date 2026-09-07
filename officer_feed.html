@@ -48,6 +48,9 @@
             <span class="font-headline font-bold text-lg text-slate-900 tracking-wide">Officer Feed</span>
         </div>
         <div class="flex items-center gap-4">
+            <button id="admin-nav-btn" class="hidden text-slate-500 hover:text-admin transition-colors text-sm font-bold tracking-wider uppercase items-center gap-1 border-r border-slate-300 pr-4 sm:flex" onclick="window.location.href='admin_dashboard.html'">
+                <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Dashboard
+            </button>
             <span id="officer-email" class="text-sm font-label font-bold text-slate-500 hidden sm:block"></span>
             <button id="logout-btn" class="text-slate-500 hover:text-red-500 transition-colors text-sm font-bold tracking-wider uppercase flex items-center gap-1">
                 Logout <span class="material-symbols-outlined text-sm">logout</span>
@@ -113,6 +116,11 @@
                     const jur = tokenResult.claims.jurisdiction || 'Unknown';
                     document.getElementById('jurisdiction-label').innerHTML = `Jurisdiction: <span class="font-bold text-slate-700">${jur}</span>`;
                     
+                    if (role === 'admin') {
+                        document.getElementById('admin-nav-btn').classList.remove('hidden');
+                    }
+                    
+                    await loadOfficerList();
                     loadIncidents();
                     
                     // Setup Real-Time Listener for Notifications
@@ -156,11 +164,28 @@
             }
         });
 
-        window.updateStatus = async function(incidentId, status) {
+        let availableOfficers = [];
+        
+        async function loadOfficerList() {
             try {
+                const response = await apiFetch('https://sentinel-system-nfqp.onrender.com/api/officers/list');
+                if (response.ok) {
+                    const data = await response.json();
+                    availableOfficers = data.officers;
+                }
+            } catch (err) {
+                console.error("Failed to load officers:", err);
+            }
+        }
+
+        window.updateStatus = async function(incidentId, field, value) {
+            try {
+                const payload = {};
+                payload[field] = value;
+                
                 const response = await apiFetch(`https://sentinel-system-nfqp.onrender.com/api/officer/incidents/${incidentId}/status`, {
                     method: 'PUT',
-                    body: JSON.stringify({ status })
+                    body: JSON.stringify(payload)
                 });
                 if (!response.ok) throw new Error("Update failed");
                 loadIncidents();
@@ -284,14 +309,20 @@
                                     <span class="material-symbols-outlined text-[14px]">calendar_today</span> ${formattedDate}
                                 </p>
                             </div>
-                            <div class="flex gap-2">
-                                <select class="text-xs font-bold font-label bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700 outline-none focus:border-emerald" onchange="updateStatus('${inc.id}', this.value)">
+                            <div class="flex gap-2 flex-col sm:flex-row">
+                                <select class="text-xs font-bold font-label bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700 outline-none focus:border-emerald" onchange="updateStatus('${inc.id}', 'status', this.value)">
                                     <option value="pending" ${inc.status === 'pending' ? 'selected' : ''}>Pending</option>
                                     <option value="investigating" ${inc.status === 'investigating' ? 'selected' : ''}>Investigating</option>
                                     <option value="resolved" ${inc.status === 'resolved' ? 'selected' : ''}>Resolved</option>
                                 </select>
+                                <select class="text-xs font-bold font-label bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700 outline-none focus:border-emerald max-w-[150px]" onchange="updateStatus('${inc.id}', 'assigned_to', this.value)">
+                                    <option value="">Unassigned</option>
+                                    ${availableOfficers.map(o => `<option value="${o.email}" ${inc.assigned_to === o.email ? 'selected' : ''}>${o.email}</option>`).join('')}
+                                </select>
                             </div>
                         </div>
+
+                        ${inc.assigned_to ? `<div class="mb-4 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">person</span> Assigned to: <span class="text-slate-800">${inc.assigned_to}</span></div>` : ''}
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm border-t border-slate-100 pt-4">
                             <div>
