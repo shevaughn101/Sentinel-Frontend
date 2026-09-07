@@ -214,7 +214,7 @@
             }
         }
 
-        async function loadOfficers() {
+        async function loadOfficers(currentUserRole = 'admin') {
             try {
                 const response = await apiFetch('https://sentinel-system-nfqp.onrender.com/api/admin/officers');
                 if (!response.ok) throw new Error("Failed to load officers");
@@ -240,7 +240,7 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-bold text-slate-500 uppercase">Rank:</label>
-                                <select class="glass-input rounded px-2 py-1 text-sm cursor-pointer" data-original="${user.role}" onchange="updateRole('${user.uid}', this)">
+                                <select class="glass-input rounded px-2 py-1 text-sm cursor-pointer" data-original="${user.role}" onchange="updateRole('${user.uid}', this)" ${currentUserRole === 'officer' ? 'disabled' : ''}>
                                     <option value="civilian" ${user.role === 'civilian' ? 'selected' : ''}>Civilian</option>
                                     <option value="officer" ${user.role === 'officer' ? 'selected' : ''}>Officer</option>
                                     <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
@@ -299,9 +299,17 @@
             signOut(auth).then(() => window.location.href = 'login.html');
         });
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
-                loadOfficers();
+                const tokenResult = await user.getIdTokenResult();
+                const role = tokenResult.claims.role || 'civilian';
+                
+                if (role === 'officer') {
+                    // Hide the form for officers
+                    document.getElementById('create-officer-form').closest('section').classList.add('hidden');
+                }
+                
+                loadOfficers(role);
             } else {
                 window.location.href = 'login.html';
             }
