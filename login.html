@@ -132,9 +132,12 @@
                         placeholder="name@example.com">
                 </div>
 
-                <div>
-                    <label
-                        class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Password</label>
+                <div class="relative">
+                    <div class="flex justify-between items-center mb-2">
+                        <label
+                            class="block font-label text-xs font-bold uppercase tracking-wider text-slate-700">Password</label>
+                        <button type="button" id="forgot-password-btn" class="text-xs font-bold text-emerald hover:text-emerald-700 hover:underline transition-all">Forgot Password?</button>
+                    </div>
                     <input type="password" id="password" required
                         class="glass-input w-full rounded-lg px-4 py-3 transition-shadow" placeholder="••••••••">
                 </div>
@@ -188,7 +191,9 @@
             signInWithPopup,
             googleProvider,
             appleProvider,
-            facebookProvider
+            facebookProvider,
+            sendEmailVerification,
+            sendPasswordResetEmail
         } from './firebase-config.js';
 
         const form = document.getElementById('login-form');
@@ -254,6 +259,26 @@
             }
         }
 
+        document.getElementById('forgot-password-btn').addEventListener('click', async () => {
+            const emailInput = document.getElementById('email').value;
+            if (!emailInput) {
+                showError("Please enter your email address first, then click 'Forgot Password?'");
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, emailInput);
+                errorMsg.classList.replace('text-red-700', 'text-emerald-700');
+                errorMsg.classList.replace('bg-red-50', 'bg-emerald-50');
+                errorMsg.classList.replace('border-red-200', 'border-emerald-200');
+                showError("Password reset email sent! Please check your inbox.");
+            } catch (err) {
+                errorMsg.classList.replace('text-emerald-700', 'text-red-700');
+                errorMsg.classList.replace('bg-emerald-50', 'bg-red-50');
+                errorMsg.classList.replace('border-emerald-200', 'border-red-200');
+                showError(err.message);
+            }
+        });
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.classList.add('hidden');
@@ -276,9 +301,23 @@
             try {
                 if (isSignup.checked && roleCivilian.checked) {
                     const cred = await createUserWithEmailAndPassword(auth, email, password);
-                    await handleAuthSuccess(cred);
+                    await sendEmailVerification(cred.user);
+                    auth.signOut();
+                    
+                    errorMsg.classList.replace('text-red-700', 'text-emerald-700');
+                    errorMsg.classList.replace('bg-red-50', 'bg-emerald-50');
+                    errorMsg.classList.replace('border-red-200', 'border-emerald-200');
+                    showError("Account created! Please check your email to verify your account before logging in.");
                 } else {
                     const cred = await signInWithEmailAndPassword(auth, email, password);
+                    // Check if it's a manual login (providerData usually has password as providerId)
+                    const isManual = cred.user.providerData.some(p => p.providerId === 'password');
+                    
+                    if (isManual && !cred.user.emailVerified) {
+                        auth.signOut();
+                        throw { code: 'auth/unverified-email', message: "Your email is not verified. Please check your inbox to verify it before logging in." };
+                    }
+                    
                     await handleAuthSuccess(cred);
                 }
             } catch (err) {
