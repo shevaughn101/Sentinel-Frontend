@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Sentinel Civic Response</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
             theme: {
@@ -39,8 +43,10 @@
         }
     </script>
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
         /* Light Glassmorphism utilities */
         .glass-panel {
             background: rgba(255, 255, 255, 0.7);
@@ -49,18 +55,19 @@
             border: 1px solid rgba(255, 255, 255, 1);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
         }
-        
+
         .glass-input {
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(0, 0, 0, 0.1);
             color: #0f172a !important;
         }
+
         .glass-input:focus {
             outline: none;
             border-color: #10b981;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
-        
+
         body {
             background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
             background-attachment: fixed;
@@ -68,11 +75,13 @@
         }
     </style>
 </head>
+
 <body class="font-body min-h-screen flex flex-col items-center justify-center p-6 antialiased">
-    
+
     <div class="w-full max-w-md animate-slide-up">
         <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald text-white mb-4 shadow-[0_4px_15px_rgba(16,185,129,0.3)]">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald text-white mb-4 shadow-[0_4px_15px_rgba(16,185,129,0.3)]">
                 <span class="material-symbols-outlined text-4xl">security</span>
             </div>
             <h1 class="font-headline text-3xl font-bold text-slate-900 mb-2 tracking-tight">Sentinel System</h1>
@@ -84,8 +93,10 @@
             <!-- Civilian Option -->
             <label class="cursor-pointer group relative">
                 <input type="radio" name="role" value="civilian" id="role-civilian" class="peer sr-only" checked />
-                <div class="glass-panel rounded-xl p-5 text-center transition-all duration-300 peer-checked:bg-emerald/10 peer-checked:border-emerald/50 hover:bg-white/80">
-                    <span class="material-symbols-outlined text-3xl mb-2 text-slate-400 peer-checked:text-emerald transition-colors">group</span>
+                <div
+                    class="glass-panel rounded-xl p-5 text-center transition-all duration-300 peer-checked:bg-emerald/10 peer-checked:border-emerald/50 hover:bg-white/80">
+                    <span
+                        class="material-symbols-outlined text-3xl mb-2 text-slate-400 peer-checked:text-emerald transition-colors">group</span>
                     <h3 class="font-bold text-slate-900 mb-1">Civilian Access</h3>
                     <p class="text-xs text-slate-600">Report an Incident</p>
                 </div>
@@ -94,8 +105,10 @@
             <!-- Officer Option -->
             <label class="cursor-pointer group relative">
                 <input type="radio" name="role" value="officer" id="role-officer" class="peer sr-only" />
-                <div class="glass-panel rounded-xl p-5 text-center transition-all duration-300 peer-checked:bg-amber/10 peer-checked:border-amber/50 hover:bg-white/80">
-                    <span class="material-symbols-outlined text-3xl mb-2 text-slate-400 peer-checked:text-amber transition-colors">local_police</span>
+                <div
+                    class="glass-panel rounded-xl p-5 text-center transition-all duration-300 peer-checked:bg-amber/10 peer-checked:border-amber/50 hover:bg-white/80">
+                    <span
+                        class="material-symbols-outlined text-3xl mb-2 text-slate-400 peer-checked:text-amber transition-colors">local_police</span>
                     <h3 class="font-bold text-slate-900 mb-1">Officer Portal</h3>
                     <p class="text-xs text-slate-600">Access Database</p>
                 </div>
@@ -106,43 +119,61 @@
             <!-- Top decorative highlight -->
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald via-amber to-emerald"></div>
 
-            <div id="error-message" class="hidden mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-label"></div>
+            <div id="error-message"
+                class="hidden mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-label">
+            </div>
 
             <form id="login-form" class="space-y-6">
                 <div>
-                    <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Email Address</label>
-                    <input type="email" id="email" required class="glass-input w-full rounded-lg px-4 py-3 transition-shadow" placeholder="name@example.com">
+                    <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Email
+                        Address</label>
+                    <input type="email" id="email" required
+                        class="glass-input w-full rounded-lg px-4 py-3 transition-shadow"
+                        placeholder="name@example.com">
                 </div>
-                
+
                 <div>
-                    <label class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Password</label>
-                    <input type="password" id="password" required class="glass-input w-full rounded-lg px-4 py-3 transition-shadow" placeholder="••••••••">
+                    <label
+                        class="block font-label text-xs font-bold mb-2 uppercase tracking-wider text-slate-700">Password</label>
+                    <input type="password" id="password" required
+                        class="glass-input w-full rounded-lg px-4 py-3 transition-shadow" placeholder="••••••••">
                 </div>
 
                 <div id="signup-toggle-container" class="flex items-center">
                     <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" id="is-signup" class="rounded border-slate-300 text-emerald focus:ring-emerald">
-                        <span class="ml-2 text-sm text-slate-600 group-hover:text-slate-900 transition-colors">I don't have an account (Civilian Sign up)</span>
+                        <input type="checkbox" id="is-signup"
+                            class="rounded border-slate-300 text-emerald focus:ring-emerald">
+                        <span class="ml-2 text-sm text-slate-600 group-hover:text-slate-900 transition-colors">I don't
+                            have an account (Civilian Sign up)</span>
                     </label>
                 </div>
 
-                <button type="submit" id="submit-btn" class="w-full bg-slate-900 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-800 transition-all shadow-md flex justify-center items-center gap-2 group">
+                <button type="submit" id="submit-btn"
+                    class="w-full bg-slate-900 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-800 transition-all shadow-md flex justify-center items-center gap-2 group">
                     <span id="btn-text">Secure Login</span>
-                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">login</span>
+                    <span
+                        class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">login</span>
                 </button>
             </form>
 
             <div id="social-logins" class="mt-8 pt-6 border-t border-slate-200">
-                <p class="text-center text-xs text-slate-500 font-bold uppercase tracking-wider mb-4">Or continue with</p>
+                <p class="text-center text-xs text-slate-500 font-bold uppercase tracking-wider mb-4">Or continue with
+                </p>
                 <div class="grid grid-cols-3 gap-3">
-                    <button id="google-login" type="button" class="glass-input py-2 rounded-lg hover:bg-slate-50 transition-colors flex justify-center items-center cursor-pointer">
+                    <button id="google-login" type="button"
+                        class="glass-input py-2 rounded-lg hover:bg-slate-50 transition-colors flex justify-center items-center cursor-pointer">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
                     </button>
-                    <button type="button" class="glass-input py-2 rounded-lg hover:bg-slate-50 transition-colors flex justify-center items-center opacity-50 cursor-not-allowed" title="Apple Login (Requires Paid Apple Developer Account)">
+                    <button type="button"
+                        class="glass-input py-2 rounded-lg hover:bg-slate-50 transition-colors flex justify-center items-center opacity-50 cursor-not-allowed"
+                        title="Apple Login (Requires Paid Apple Developer Account)">
                         <img src="https://www.svgrepo.com/show/511330/apple-173.svg" class="w-5 h-5" alt="Apple">
                     </button>
-                    <button id="facebook-login" type="button" class="glass-input py-2 rounded-lg hover:bg-slate-50 transition-colors flex justify-center items-center cursor-pointer" title="Facebook Login">
-                        <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5" alt="Facebook">
+                    <button id="facebook-login" type="button"
+                        class="glass-input py-2 rounded-lg hover:bg-slate-50 transition-colors flex justify-center items-center cursor-pointer"
+                        title="Facebook Login">
+                        <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5"
+                            alt="Facebook">
                     </button>
                 </div>
             </div>
@@ -150,9 +181,9 @@
     </div>
 
     <script type="module">
-        import { 
-            auth, 
-            signInWithEmailAndPassword, 
+        import {
+            auth,
+            signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
             signInWithPopup,
             googleProvider,
@@ -201,11 +232,11 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                
+
                 if (!response.ok) throw new Error("Backend verification failed");
-                
+
                 const data = await response.json();
-                
+
                 if (data.role === 'admin') {
                     window.location.href = 'admin_dashboard.html';
                 }
@@ -226,11 +257,11 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.classList.add('hidden');
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const submitBtn = document.getElementById('submit-btn');
-            
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">autorenew</span>';
 
@@ -312,4 +343,5 @@
         });
     </script>
 </body>
+
 </html>
